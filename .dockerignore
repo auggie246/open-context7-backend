@@ -1,0 +1,8 @@
+.git
+.venv
+.omo/evidence
+.omo/local-store
+src/context7--upstash-context7-mcp-3.2.1/node_modules
+src/context7--upstash-context7-mcp-3.2.1/packages/*/dist
+__pycache__
+*.pyc
