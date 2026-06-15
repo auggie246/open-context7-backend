@@ -1,0 +1,30 @@
+[
+  {
+    "id": "code-1",
+    "library_id": "/internal/platform",
+    "version": "main",
+    "source_path": "guide.mdx",
+    "heading": "Install",
+    "chunk_index": 0,
+    "language": "bash",
+    "kind": "code",
+    "token_count": 4,
+    "content": "helm upgrade platform",
+    "start_line": 1,
+    "end_line": 1
+  },
+  {
+    "id": "prose-1",
+    "library_id": "/internal/platform",
+    "version": "main",
+    "source_path": "guide.mdx",
+    "heading": "Configure",
+    "chunk_index": 1,
+    "language": null,
+    "kind": "prose",
+    "token_count": 5,
+    "content": "Use valuesFrom for config.",
+    "start_line": 2,
+    "end_line": 2
+  }
+]

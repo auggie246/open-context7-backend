@@ -1,0 +1,20 @@
+id: /example/docs
+title: Example Docs
+description: Example local documentation catalog entry.
+aliases:
+  - example
+versions:
+  - main
+source:
+  type: dir
+  directory: examples/docs
+  branch: main
+  include:
+    - "**/*.md"
+    - "**/*.mdx"
+  exclude:
+    - "**/draft*"
+state:
+  status: finalized
+  totalSnippets: 0
+  lastUpdateDate: 2026-06-15

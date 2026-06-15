@@ -1,0 +1,22 @@
+id: /internal/platform
+title: Internal Platform
+description: Deployment and Helm documentation for the internal platform.
+aliases:
+  - platform
+  - helm
+  - valuesFrom
+versions:
+  - main
+source:
+  type: dir
+  directory: examples/platform-docs
+  branch: main
+  include:
+    - "**/*.md"
+    - "**/*.mdx"
+  exclude:
+    - "**/draft*"
+state:
+  status: finalized
+  totalSnippets: 2
+  lastUpdateDate: 2026-06-15

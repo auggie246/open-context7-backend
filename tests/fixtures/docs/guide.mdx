@@ -1,0 +1,32 @@
+---
+title: Platform Guide
+description: Ingestion fixture
+---
+import Tabs from "@theme/Tabs";
+
+# Platform Guide
+
+Intro text explains valuesFrom and platform setup.
+
+<Callout type="info">
+JSX content should be tolerated without becoming code.
+</Callout>
+
+## Install
+
+Install the package before configuring values.
+
+```bash
+helm upgrade platform ./chart \
+  --set valuesFrom=config.yaml
+```
+
+Follow-up prose after the install command.
+
+## Configure
+
+```ts
+export const valuesFrom = ["config.yaml", "secret.yaml"];
+```
+
+Configuration prose references valuesFrom again.

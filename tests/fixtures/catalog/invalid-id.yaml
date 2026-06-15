@@ -1,0 +1,17 @@
+id: internal/platform
+title: Broken Platform
+description: This fixture has an invalid Context7 library id.
+aliases: []
+versions:
+  - main
+source:
+  type: dir
+  directory: tests/fixtures/catalog/docs/platform
+  branch: main
+  include:
+    - "**/*.md"
+  exclude: []
+state:
+  status: finalized
+  totalSnippets: 0
+  lastUpdateDate: 2026-06-01

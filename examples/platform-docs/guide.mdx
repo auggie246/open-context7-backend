@@ -1,0 +1,9 @@
+# Platform Guide
+
+Use HelmRelease valuesFrom to load platform configuration from ConfigMaps.
+
+```yaml
+valuesFrom:
+  - kind: ConfigMap
+    name: platform-values
+```
