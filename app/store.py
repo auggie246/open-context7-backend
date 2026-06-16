@@ -4,7 +4,7 @@ from pydantic import TypeAdapter
 
 from app.ingest.models import DocChunk, ParsedDocChunk, materialize_chunk
 
-DEFAULT_STORE_PATH = Path(".omo/local-store/chunks.json")
+DEFAULT_STORE_PATH = Path(".local-store/chunks.json")
 
 
 def save_chunks(

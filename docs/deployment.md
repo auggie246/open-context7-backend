@@ -24,7 +24,7 @@ uv run uvicorn app.main:app --host 127.0.0.1 --port 8000
 curl -f http://127.0.0.1:8000/healthz
 ```
 
-With default settings, retrieval uses local lexical retrieval and reads `.omo/local-store/chunks.json`. Auth is disabled unless `DOCS_API_KEYS` is set.
+With default settings, retrieval uses local lexical retrieval and reads `.local-store/chunks.json`. Auth is disabled unless `DOCS_API_KEYS` is set.
 
 For authenticated local testing:
 

@@ -30,7 +30,7 @@ uv run context7-backend --help
 - `examples/`: local example documentation used by ingest and QA commands.
 - `docs/`: human documentation for the local backend.
 - `scripts/`: quality and contract QA scripts.
-- `.omo/local-store/chunks.json`: local generated chunk store used by lexical retrieval.
+- `.local-store/chunks.json`: local generated chunk store used by lexical retrieval.
 - `src/context7--upstash-context7-mcp-3.2.1`: vendored reference material. Do not edit, format, lint, or commit changes under this tree.
 
 ## Local Run Loop
@@ -101,7 +101,7 @@ Use targeted tests while editing a narrow surface, then run the quality gate bef
 
 ## Gotchas
 
-- `.omo/local-store/chunks.json` is generated local retrieval state, not catalog metadata.
+- `.local-store/chunks.json` is generated local retrieval state, not catalog metadata.
 - The vendored Context7 source is reference material only.
 - If QA starts services, clean them up and check ports `8000` and `6333`.
 

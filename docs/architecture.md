@@ -14,7 +14,7 @@ The backend is intentionally small and deterministic:
 
 1. Catalog metadata starts in `libraries/*.yaml`. `app/catalog.py` validates each YAML file, parses library IDs, and exposes the base ID, optional version, aliases, versions, source directory, include/exclude globs, and state fields.
 2. Ingestion runs through `context7-backend ingest`, implemented in `app/cli.py`. The CLI finds the matching catalog, resolves the source directory, applies catalog include/exclude globs, parses Markdown/MDX files, and materializes chunks for a specific `library_id` and `version`.
-3. The local store is `.omo/local-store/chunks.json`, written by `app/store.py`. Saving chunks replaces the previous chunks for the same library/version and keeps the merged store sorted by library ID, version, source path, and chunk index.
+3. The local store is `.local-store/chunks.json`, written by `app/store.py`. Saving chunks replaces the previous chunks for the same library/version and keeps the merged store sorted by library ID, version, source path, and chunk index.
 4. Retrieval happens in `app/retrieval`. `app/routes.py` calls `retrieve_chunks()`, which selects the backend from `DOCS_RETRIEVAL_MODE`.
 5. Formatting happens in `app/formatters.py`. Text mode emits Context7-style snippet blocks. JSON mode splits retrieved chunks into `codeSnippets` and `infoSnippets`.
 6. HTTP responses return from the FastAPI route handlers in `app/routes.py`, with models defined in `app/models.py`.
@@ -70,7 +70,7 @@ Local lexical retrieval is the default mode. `app/routes.py` calls `LexicalRetri
 
 `app/retrieval/lexical.py` tokenizes the query and chunk content, filters by library ID and version, optionally filters by chunk kind, ranks by token overlap, and applies a token budget. Sorting is deterministic: score descending, then source path, heading, and chunk index.
 
-This mode uses the local `.omo/local-store/chunks.json` store and does not require Qdrant.
+This mode uses the local `.local-store/chunks.json` store and does not require Qdrant.
 
 ## Qdrant Retrieval
 

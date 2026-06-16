@@ -31,8 +31,8 @@ Symptoms:
 Checks:
 
 ```sh
-test -s .omo/local-store/chunks.json
-rg -n 'valuesFrom|platform' examples/platform-docs .omo/local-store/chunks.json
+test -s .local-store/chunks.json
+rg -n 'valuesFrom|platform' examples/platform-docs .local-store/chunks.json
 curl 'http://127.0.0.1:8000/api/v2/context?libraryId=/internal/platform&query=valuesFrom'
 ```
 
@@ -103,7 +103,7 @@ Symptoms:
 Checks:
 
 ```sh
-rm -f .omo/local-store/chunks.json
+rm -f .local-store/chunks.json
 uv run context7-backend ingest --library /internal/platform --version main --source-dir examples/platform-docs
 ```
 

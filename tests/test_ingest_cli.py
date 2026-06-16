@@ -1,13 +1,13 @@
 from pathlib import Path
 
 from app.cli import cli
-from app.store import load_chunks
+from app.store import DEFAULT_STORE_PATH, load_chunks
 from typer.testing import CliRunner
 
 
 def test_ingest_cli_when_source_dir_given_persists_chunks() -> None:
     runner = CliRunner()
-    Path(".omo/local-store/chunks.json").unlink(missing_ok=True)
+    DEFAULT_STORE_PATH.unlink(missing_ok=True)
 
     result = runner.invoke(
         cli,
@@ -22,7 +22,7 @@ def test_ingest_cli_when_source_dir_given_persists_chunks() -> None:
         ],
     )
 
-    chunks = load_chunks(Path(".omo/local-store/chunks.json"))
+    chunks = load_chunks(DEFAULT_STORE_PATH)
 
     assert result.exit_code == 0
     assert "ingested 6 chunks" in result.stdout
@@ -31,7 +31,7 @@ def test_ingest_cli_when_source_dir_given_persists_chunks() -> None:
 
 def test_ingest_cli_applies_catalog_excludes_and_replaces_orphans(tmp_path: Path) -> None:
     runner = CliRunner()
-    store_path = Path(".omo/local-store/chunks.json")
+    store_path = DEFAULT_STORE_PATH
     store_path.unlink(missing_ok=True)
     docs_dir = tmp_path / "docs"
     docs_dir.mkdir()
@@ -80,7 +80,7 @@ def test_ingest_cli_applies_catalog_excludes_and_replaces_orphans(tmp_path: Path
 
 def test_ingest_cli_rejects_symlink_escape(tmp_path: Path) -> None:
     runner = CliRunner()
-    store_path = Path(".omo/local-store/chunks.json")
+    store_path = DEFAULT_STORE_PATH
     store_path.unlink(missing_ok=True)
     docs_dir = tmp_path / "docs"
     outside_dir = tmp_path / "outside"
@@ -107,3 +107,7 @@ def test_ingest_cli_rejects_symlink_escape(tmp_path: Path) -> None:
     assert result.exit_code != 0
     assert "matched file escapes source directory" in result.output
     assert not store_path.exists()
+
+
+def test_default_store_path_uses_project_local_store() -> None:
+    assert Path(".local-store/chunks.json") == DEFAULT_STORE_PATH

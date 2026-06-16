@@ -49,7 +49,7 @@ Each stored chunk includes the library ID, version, source path, heading, chunk 
 
 ## Local Store And Replacement
 
-The local store path is `.omo/local-store/chunks.json`, defined in `app/store.py`. `save_chunks` materializes parsed chunks, loads any existing local chunks, removes existing chunks for the same `library_id` and `version`, and writes the merged result sorted by library ID, version, source path, and chunk index.
+The local store path is `.local-store/chunks.json`, defined in `app/store.py`. `save_chunks` materializes parsed chunks, loads any existing local chunks, removes existing chunks for the same `library_id` and `version`, and writes the merged result sorted by library ID, version, source path, and chunk index.
 
 That replacement behavior intentionally removes orphan chunks for a library/version when a later ingest has fewer files or changed include/exclude patterns. Chunks for other libraries or versions remain in the local store.
 
