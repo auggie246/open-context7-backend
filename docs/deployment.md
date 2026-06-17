@@ -44,6 +44,9 @@ curl -H 'Authorization: Bearer dev-local-secret' \
 uv run uvicorn app.main:app --host 0.0.0.0 --port 8000
 ```
 
+This is the FastAPI backend image only. Qdrant is not built into app image,
+is not installed by Dockerfile, and is not run by the backend container.
+
 The container listens on `0.0.0.0` internally so Docker can publish it. Compose binds it only to loopback on the host.
 
 ## Docker Compose
@@ -58,10 +61,14 @@ curl -H 'Authorization: Bearer dev-local-secret' \
 docker compose down
 ```
 
+Compose builds `docs-api` from the local backend-only Dockerfile and starts a
+separate Qdrant service from image `qdrant/qdrant:v1.12.6`.
 Compose host bindings:
 
 - API: `127.0.0.1:8000`
 - Qdrant: `127.0.0.1:6333`
+
+Inside Compose, `docs-api` reaches Qdrant at `DOCS_QDRANT_URL=http://qdrant:6333`.
 
 Compose API settings:
 
@@ -81,6 +88,8 @@ Because Compose sets `DOCS_API_KEYS` by default, `/api/v2/*` calls need `Authori
 volumes:
   qdrant-data:
 ```
+
+The separate Qdrant container uses the `qdrant-data` named volume.
 
 Qdrant stores data at `/qdrant/storage` inside the container. `docker compose down` stops and removes containers but keeps the named volume. Use this only when you intentionally want to remove stored Qdrant data:
 

@@ -81,13 +81,31 @@ Run:
 scripts/qa_qdrant_contract.sh
 ```
 
-The script starts Qdrant with Docker Compose, waits for `http://127.0.0.1:6333/collections`, runs the Qdrant smoke command, ingests example docs with `DOCS_RETRIEVAL_MODE=qdrant`, starts the API on `127.0.0.1:8000`, calls `/api/v2/context`, prints `QDRANT QA APPROVED`, and tears down with `docker compose down`.
+Qdrant runs as a separate Compose service from `qdrant/qdrant:v1.12.6`; it is
+not built into the FastAPI backend image. Compose integration checks
+verify `docs-api` uses `DOCS_QDRANT_URL=http://qdrant:6333`, host ports stay
+loopback-bound to `127.0.0.1:8000` and `127.0.0.1:6333`, `qdrant-data`
+volume persists after `docker compose down`, and `docker compose down -v`
+is used only when intentionally removing Qdrant data.
 
-## Why `qa_full.sh` Is Not Docs-Only Proof
+The script starts Qdrant with Docker Compose, waits
+`http://127.0.0.1:6333/collections`, runs the Qdrant smoke command, ingests
+example docs with `DOCS_RETRIEVAL_MODE=qdrant`, starts the API on
+`127.0.0.1:8000`, calls `/api/v2/context`, prints `QDRANT QA APPROVED`, and
+tears down with `docker compose down`.
 
-`scripts/qa_full.sh` is useful for broad repository verification, but it is not the docs-only proof for this documentation-upgrade plan. `scripts/qa_full.sh` still references `.omo/plans/context7-backend-reverse-engineer.md` through `scripts/verify_plan_compliance.sh`, so a successful run does not prove the targeted documentation-upgrade acceptance criteria.
+## Why `qa_full.sh` Is Not Split-Qdrant Proof
 
-For this plan, docs-only proof should combine `tests/test_docs_contract.py` with exact `test -s` and `rg` checks for the docs files being changed. Use HTTP, MCP, and Qdrant QA scripts when the documented examples or contract surfaces need real-service verification.
+Scope: `scripts/qa_full.sh` verifies broad repository behavior, not
+split-Qdrant Compose plan proof. The The plan compliance path remains
+`.omo/plans/context7-backend-reverse-engineer.md` through
+`scripts/verify_plan_compliance.sh`; a successful run does not prove
+`.omo/plans/split-qdrant-compose.md` acceptance criteria.
+
+Proof set: `tests/test_docs_contract.py`, `tests/test_deployment_compose.py`,
+focused `rg` checks, and captured split-Qdrant Compose evidence. HTTP, MCP, and
+Qdrant QA scripts cover documented example contract surfaces that need
+real-service verification.
 
 ## Cleanup Checks
 
@@ -98,11 +116,14 @@ Any QA command that starts services must clean them up. After HTTP, MCP, or Qdra
 ! lsof -i :6333
 ```
 
+Compose defaults `/api/v2/*` auth to `Authorization: Bearer dev-local-secret`;
+missing auth can make a healthy stack look broken.
+
 If a port remains bound, identify and clean up the process or container before finishing.
 
 ## Gotchas
 
-- Do not use `scripts/qa_full.sh` as the docs-only proof for this plan.
+- Treat `scripts/qa_full.sh` as broad QA, not split-Qdrant Compose plan proof.
 - A successful script banner is not enough if a service remains bound afterward.
 - Use `PYTHONDONTWRITEBYTECODE=1` for pytest commands to avoid bytecode artifacts under `app` and `tests`.
 
@@ -112,7 +133,7 @@ Useful focused checks:
 
 ```sh
 rg -q 'qa_http_contract.sh|qa_mcp_contract.sh|qa_qdrant_contract.sh' docs/testing.md
-rg -q 'qa_full.sh.*context7-backend-reverse-engineer|not.*docs-only proof|docs-only' docs/testing.md
+rg -q 'split-Qdrant|split-qdrant|Compose architecture|qa_full.sh.*context7-backend-reverse-engineer' docs/testing.md
 ```
 
 ## Next

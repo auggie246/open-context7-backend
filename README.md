@@ -141,10 +141,20 @@ curl -f http://localhost:8000/healthz
 docker compose down
 ```
 
+The Dockerfile builds only the FastAPI backend image. Qdrant is not built into
+the app image and does not run from the backend container; Compose starts a
+separate Qdrant service from `qdrant/qdrant:v1.12.6`.
+
 Compose binds the API to `127.0.0.1:8000` and Qdrant to `127.0.0.1:6333`.
-It sets `DOCS_RETRIEVAL_MODE=qdrant`, deterministic embeddings, and
+Inside Compose, `docs-api` reaches Qdrant at
+`DOCS_QDRANT_URL=http://qdrant:6333`. It sets
+`DOCS_RETRIEVAL_MODE=qdrant`, deterministic embeddings, and
 `DOCS_API_KEYS=${DOCS_API_KEYS:-dev-local-secret}`. Calls to `/api/v2/*` need
 `Authorization: Bearer dev-local-secret` unless you override the key.
+
+Qdrant data lives in the named `qdrant-data` volume. `docker compose down`
+stops containers and preserves volume; `docker compose down -v` removes
+intentionally.
 
 ## Development And QA
 

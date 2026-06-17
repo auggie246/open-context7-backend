@@ -36,6 +36,10 @@ DOCS_RERANKER_ENABLED=false
 
 ## Docker Compose Defaults
 
+`docker-compose.yml` builds the FastAPI backend image for `docs-api` and runs
+Qdrant as a separate Qdrant service from `qdrant/qdrant:v1.12.6`; Qdrant is not
+built into the app image.
+
 `docker-compose.yml` runs the API with:
 
 - `DOCS_QDRANT_URL=http://qdrant:6333`
@@ -44,7 +48,10 @@ DOCS_RERANKER_ENABLED=false
 - `DOCS_RERANKER_ENABLED=false`
 - `DOCS_API_KEYS=${DOCS_API_KEYS:-dev-local-secret}`
 
-Compose binds the API and Qdrant to `127.0.0.1` on ports `8000` and `6333`.
+Compose binds API and Qdrant to `127.0.0.1` on ports `8000` and `6333`.
+Inside Compose, `docs-api` reaches Qdrant at `DOCS_QDRANT_URL=http://qdrant:6333`.
+Qdrant persists data in the `qdrant-data` named volume; `docker compose down`
+keeps it, and `docker compose down -v` removes it intentionally.
 
 ## Gotchas
 

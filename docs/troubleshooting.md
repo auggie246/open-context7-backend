@@ -72,7 +72,14 @@ DOCS_RETRIEVAL_MODE=qdrant uv run python -m app.retrieval.qdrant --smoke
 DOCS_RETRIEVAL_MODE=qdrant uv run context7-backend ingest --library /internal/platform --version main --source-dir examples/platform-docs
 ```
 
-`docker-compose.yml` starts Qdrant on `127.0.0.1:6333`. Qdrant retrieval uses the shared `docs` collection with payload indexes for `library_id`, `version`, `kind`, and `source_path`. Re-ingest after Qdrant is ready so the collection contains current chunks.
+Qdrant runs as a separate service from `qdrant/qdrant:v1.12.6`; it is not built
+into app image. Inside Compose, the FastAPI backend image connects to it at
+`DOCS_QDRANT_URL=http://qdrant:6333`.
+
+`docker-compose.yml` starts Qdrant on `127.0.0.1:6333`. Qdrant retrieval uses
+the shared `docs` collection payload indexes for `library_id`, `version`,
+`kind`, and `source_path`. Re-ingest after Qdrant is ready so the collection
+contains current chunks.
 
 ## Port Conflicts
 
@@ -90,7 +97,15 @@ lsof -i :6333
 docker compose down
 ```
 
-This repository expects local API traffic on `127.0.0.1:8000` and Qdrant on `127.0.0.1:6333`. Stop stale processes or containers before rerunning QA, then verify the ports are free.
+`docker compose down` should free containers while keeping the `qdrant-data`
+named volume; use `docker compose down -v` only when intentionally deleting
+Qdrant storage. Compose defaults `/api/v2/*` auth to
+`Authorization: Bearer dev-local-secret`, so check auth before treating a
+request as a service failure.
+
+This repository expects local API traffic on `127.0.0.1:8000` and Qdrant on
+`127.0.0.1:6333`. Stop stale processes or containers before rerunning QA, then
+confirm the ports are free.
 
 ## Stale Local Store
 
