@@ -1,0 +1,65 @@
+replicaCount: 1
+
+image:
+  repository: ghcr.io/auggie246/open-context7-backend
+  pullPolicy: IfNotPresent
+  tag: ""
+
+imagePullSecrets: []
+nameOverride: ""
+fullnameOverride: ""
+
+serviceAccount:
+  create: true
+  automount: true
+  annotations: {}
+  name: ""
+
+podAnnotations: {}
+podLabels: {}
+podSecurityContext: {}
+
+securityContext:
+  allowPrivilegeEscalation: false
+  capabilities:
+    drop:
+      - ALL
+  readOnlyRootFilesystem: false
+  runAsNonRoot: true
+  runAsUser: 1000
+
+service:
+  type: ClusterIP
+  port: 8000
+  qdrantPort: 6333
+  exposeQdrant: true
+
+resources: {}
+
+nodeSelector: {}
+tolerations: []
+affinity: {}
+
+config:
+  apiKeys: dev-local-secret
+  existingApiKeysSecret: ""
+  apiKeysSecretKey: DOCS_API_KEYS
+  qdrantUrl: ""
+  retrievalMode: qdrant
+  embeddingMode: deterministic
+  maxContextTokens: ""
+  rerankerEnabled: "false"
+
+qdrant:
+  enabled: true
+  image:
+    repository: qdrant/qdrant
+    tag: v1.12.6
+    pullPolicy: IfNotPresent
+  persistence:
+    enabled: true
+    size: 1Gi
+    storageClassName: ""
+    accessModes:
+      - ReadWriteOnce
+  resources: {}
