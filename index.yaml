@@ -1,0 +1,14 @@
+apiVersion: v1
+entries:
+  open-context7-backend:
+  - apiVersion: v2
+    appVersion: 0.1.0
+    created: "2026-06-17T07:06:05.162976918Z"
+    description: Context7-compatible documentation backend with optional bundled Qdrant
+    digest: 2a39f46328c4cb3808298ed6e58571cad373d5b0b85bfd3ccb23b4a11450d3ba
+    name: open-context7-backend
+    type: application
+    urls:
+    - open-context7-backend-0.1.0.tgz
+    version: 0.1.0
+generated: "2026-06-17T07:06:05.162981907Z"
