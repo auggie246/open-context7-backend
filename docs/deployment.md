@@ -2,16 +2,20 @@
 
 Purpose: document the supported local deployment paths for Open Context7 Backend.
 
-Source of truth: `Dockerfile`, `docker-compose.yml`, `app/main.py`, `app/settings.py`, and `AGENTS.md`.
+Source of truth: `Dockerfile`, `docker-compose.yml`,
+`charts/open-context7-backend`, `.github/workflows/release-helm-chart.yml`,
+`app/main.py`, `app/settings.py`, and `AGENTS.md`.
 
 ## Supported Paths
 
-This repository currently documents two deployment modes:
+This repository currently documents three deployment modes:
 
 - Local `uvicorn` for development and small local use.
 - Docker Compose with the API plus Qdrant.
+- Helm chart deployment for Kubernetes.
 
-Kubernetes, k8s manifests, hosted multi-tenant deployment, OIDC/team auth, and a web UI are not implemented and are out of scope for this backend.
+Hosted multi-tenant deployment, OIDC/team auth, and a web UI are not implemented
+and are out of scope for this backend.
 
 ## Local Uvicorn
 
@@ -109,6 +113,39 @@ docker compose down
 
 If either port is still bound, identify the owning process before starting another local API or Qdrant instance.
 
+## Helm Chart
+
+Helm chart lives at `charts/open-context7-backend`. It deploys FastAPI backend
+image `ghcr.io/auggie246/open-context7-backend` by default and uses chart
+`appVersion` as image tag unless `image.tag` set.
+
+Install from repository:
+
+```sh
+helm install open-context7-backend ./charts/open-context7-backend
+```
+
+By default, `qdrant.enabled=true` runs Qdrant as a sidecar container in same
+Deployment as `docs-api`, with persistent storage mounted at `/qdrant/storage`.
+API container uses `DOCS_QDRANT_URL=http://127.0.0.1:6333`,
+`DOCS_RETRIEVAL_MODE=qdrant`, deterministic embeddings, reranker disabled, and
+`DOCS_API_KEYS=dev-local-secret`, matching Docker Compose behavior.
+
+Disable bundled Qdrant and point API at external service:
+
+```sh
+helm install open-context7-backend ./charts/open-context7-backend \
+  --set qdrant.enabled=false \
+  --set config.qdrantUrl=http://qdrant:6333
+```
+
+Set `config.apiKeys=""` to disable bearer auth, or set
+`config.existingApiKeysSecret` to read `DOCS_API_KEYS` from existing Secret.
+
+Helm chart releases publish from `charts/` to `gh-pages` branch using
+`.github/workflows/release-helm-chart.yml` and `helm/chart-releaser-action`.
+Configure GitHub Pages for repository to serve from `gh-pages` branch.
+
 ## Gotchas
 
 - Local `uvicorn` defaults to local lexical retrieval unless environment variables select Qdrant retrieval.
@@ -122,7 +159,7 @@ Useful focused checks:
 
 ```sh
 test -s docs/deployment.md
-rg -q 'docker compose up -d --build docs-api qdrant|127.0.0.1:8000|127.0.0.1:6333|docker compose down' docs/deployment.md
+rg -q 'docker compose up -d --build docs-api qdrant|127.0.0.1:8000|127.0.0.1:6333|docker compose down|helm install open-context7-backend' docs/deployment.md
 ```
 
 ## Next

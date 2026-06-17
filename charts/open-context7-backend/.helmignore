@@ -1,0 +1,9 @@
+.git/
+.github/
+.omo/
+.omc/
+.ruff_cache/
+.serena/
+*.pyc
+__pycache__/
+.DS_Store

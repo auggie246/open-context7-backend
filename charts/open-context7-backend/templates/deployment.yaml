@@ -1,0 +1,106 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "open-context7-backend.fullname" . }}
+  labels:
+    {{- include "open-context7-backend.labels" . | nindent 4 }}
+spec:
+  replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels:
+      {{- include "open-context7-backend.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      {{- with .Values.podAnnotations }}
+      annotations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      labels:
+        {{- include "open-context7-backend.labels" . | nindent 8 }}
+        {{- with .Values.podLabels }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
+    spec:
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      serviceAccountName: {{ include "open-context7-backend.serviceAccountName" . }}
+      securityContext:
+        {{- toYaml .Values.podSecurityContext | nindent 8 }}
+      containers:
+        - name: docs-api
+          securityContext:
+            {{- toYaml .Values.securityContext | nindent 12 }}
+          image: {{ include "open-context7-backend.image" . | quote }}
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          ports:
+            - name: http
+              containerPort: 8000
+              protocol: TCP
+          env:
+            - name: DOCS_QDRANT_URL
+              value: {{ include "open-context7-backend.qdrantUrl" . | quote }}
+            - name: DOCS_RETRIEVAL_MODE
+              value: {{ .Values.config.retrievalMode | quote }}
+            - name: DOCS_EMBEDDING_MODE
+              value: {{ .Values.config.embeddingMode | quote }}
+            - name: DOCS_RERANKER_ENABLED
+              value: {{ .Values.config.rerankerEnabled | quote }}
+            {{- if .Values.config.maxContextTokens }}
+            - name: DOCS_MAX_CONTEXT_TOKENS
+              value: {{ .Values.config.maxContextTokens | quote }}
+            {{- end }}
+            {{- if or .Values.config.apiKeys .Values.config.existingApiKeysSecret }}
+            - name: DOCS_API_KEYS
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "open-context7-backend.apiKeysSecretName" . }}
+                  key: {{ .Values.config.apiKeysSecretKey }}
+            {{- end }}
+          livenessProbe:
+            httpGet:
+              path: /healthz
+              port: http
+          readinessProbe:
+            httpGet:
+              path: /healthz
+              port: http
+          resources:
+            {{- toYaml .Values.resources | nindent 12 }}
+        {{- if .Values.qdrant.enabled }}
+        - name: qdrant
+          image: "{{ .Values.qdrant.image.repository }}:{{ .Values.qdrant.image.tag }}"
+          imagePullPolicy: {{ .Values.qdrant.image.pullPolicy }}
+          ports:
+            - name: qdrant
+              containerPort: 6333
+              protocol: TCP
+          volumeMounts:
+            - name: qdrant-storage
+              mountPath: /qdrant/storage
+          resources:
+            {{- toYaml .Values.qdrant.resources | nindent 12 }}
+        {{- end }}
+      {{- if .Values.qdrant.enabled }}
+      volumes:
+        - name: qdrant-storage
+          {{- if .Values.qdrant.persistence.enabled }}
+          persistentVolumeClaim:
+            claimName: {{ include "open-context7-backend.fullname" . }}-qdrant
+          {{- else }}
+          emptyDir: {}
+          {{- end }}
+      {{- end }}
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}

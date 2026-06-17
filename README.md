@@ -28,7 +28,8 @@ UI.
 
 - Python 3.12 or newer.
 - `uv` for dependency management and command execution.
-- Docker and Docker Compose only when using Qdrant or the Compose stack.
+- Docker and Docker Compose for Qdrant or the Compose stack.
+- Helm for Kubernetes chart rendering or deployment.
 - Local documentation sources, either the example docs in `examples/` or a
   catalog entry under `libraries/`.
 
@@ -156,6 +157,22 @@ Qdrant data lives in the named `qdrant-data` volume. `docker compose down`
 stops containers and preserves volume; `docker compose down -v` removes
 intentionally.
 
+## Helm
+
+Kubernetes deployment support lives in `charts/open-context7-backend`. The chart
+defaults to `ghcr.io/auggie246/open-context7-backend` and can run Qdrant as a
+sidecar in the same Deployment:
+
+```sh
+helm install open-context7-backend ./charts/open-context7-backend
+helm install open-context7-backend ./charts/open-context7-backend \
+  --set qdrant.enabled=false \
+  --set config.qdrantUrl=http://qdrant:6333
+```
+
+Helm chart releases publish to the `gh-pages` branch from
+`.github/workflows/release-helm-chart.yml`.
+
 ## Development And QA
 
 Common commands:
@@ -186,7 +203,7 @@ longer bound before finishing.
   token budgets, and reranking.
 - [Configuration](docs/configuration.md): supported environment variables.
 - [Auth](docs/auth.md): bearer auth, disabled-by-default behavior, and 401s.
-- [Deployment](docs/deployment.md): local uvicorn and Docker Compose operation.
+- [Deployment](docs/deployment.md): local uvicorn, Docker Compose, and Helm operation.
 - [Development](docs/development.md): project layout and local development.
 - [Testing](docs/testing.md): targeted tests and QA scripts.
 - [Troubleshooting](docs/troubleshooting.md): common failures and where to look.
@@ -204,7 +221,7 @@ The following are out of scope for the current v1 backend or not available:
 
 - Web UI.
 - OIDC, OpenID, or team auth.
-- Kubernetes deployment or manifests.
+- Raw Kubernetes manifests outside `charts/open-context7-backend`.
 - HTML or sitemap crawling.
 - LLM-based snippet extraction.
 - Vendored `@upstash/context7-mcp` source edits.
