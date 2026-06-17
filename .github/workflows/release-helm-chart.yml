@@ -25,6 +25,28 @@ jobs:
           git config user.name "$GITHUB_ACTOR"
           git config user.email "$GITHUB_ACTOR@users.noreply.github.com"
 
+      - name: Ensure GitHub Pages branch
+        run: |
+          set -euo pipefail
+
+          if git ls-remote --exit-code --heads origin gh-pages >/dev/null 2>&1; then
+            git fetch origin gh-pages:refs/remotes/origin/gh-pages
+            exit 0
+          fi
+
+          worktree="$(mktemp -d)"
+          cleanup() {
+            git worktree remove --force "$worktree" >/dev/null 2>&1 || rm -rf "$worktree"
+          }
+          trap cleanup EXIT
+
+          git worktree add --detach "$worktree" HEAD
+          git -C "$worktree" switch --orphan gh-pages
+          git -C "$worktree" rm -rf . >/dev/null 2>&1 || true
+          git -C "$worktree" commit --allow-empty -m "chore: initialize GitHub Pages branch"
+          git -C "$worktree" push origin gh-pages
+          git fetch origin gh-pages:refs/remotes/origin/gh-pages
+
       - name: Run chart-releaser
         uses: helm/chart-releaser-action@v1.7.0
         with:
