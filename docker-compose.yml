@@ -9,6 +9,8 @@ services:
       DOCS_API_KEYS: ${DOCS_API_KEYS:-dev-local-secret}
     ports:
       - "127.0.0.1:8000:8000"
+    volumes:
+      - ./data:/app/data:ro
     depends_on:
       qdrant:
         condition: service_started
